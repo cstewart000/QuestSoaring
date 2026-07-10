@@ -7,14 +7,16 @@ Based on `pdr.txt`. Unity 2022 LTS + URP, Meta Quest standalone.
 ### M1 — Project Foundation (this repo)
 - [x] Git + GitHub, Unity skeleton, test framework
 - [x] Cursor rule: commit each major change
-- [ ] Open in Unity 2022.3 LTS, create URP 3D template, import Meta XR All-in-One
+- [x] Open in Unity 2022.3 LTS, create URP 3D template, import Meta XR All-in-One + XR Hands
 
 ### M2 — MVP Flying (target: playable loop)
 - [x] `GliderAeroModel` — lift, drag, stall heuristics
 - [x] `GliderController` — applies forces to Rigidbody
 - [x] `VRGliderInput` — controller tilt = yoke, twist = rudder
-- [ ] Scene: glider prefab + skybox + grayscale post-processing volume
-- [ ] Basic instruments: vario, altimeter (UI canvas on wrist or panel)
+- [x] Scene: `Main.unity` + `SceneBootstrap` builds glider, terrain, thermals
+- [x] Basic instruments: vario, altimeter, airspeed panel
+- [x] `DesktopFlightInput` — W/S A/D Q/E for editor testing
+- [ ] Run **Quest Soaring → Setup Main Scene** to bake OVRCameraRig into scene
 
 ### M3 — World
 - [x] `ProceduralTerrain` — chunked low-poly heightmap mesh

@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using QuestSoaring.Aerodynamics;
 using QuestSoaring.Terrain;
+using QuestSoaring.UI;
 using QuestSoaring.Weather;
 using UnityEngine;
 
@@ -79,6 +80,23 @@ namespace QuestSoaring.Tests
         {
             var h = HeightNoise.Sample(0f, 0f, 800f, 4);
             Assert.That(h, Is.InRange(0f, 400f));
+        }
+    }
+
+    public class FlightInstrumentsTests
+    {
+        [Test]
+        public void Vario_PositiveWhenClimbing()
+        {
+            var vario = FlightInstruments.CalcVarioMps(110f, 100f, 1f);
+            Assert.AreEqual(10f, vario, 0.01f);
+        }
+
+        [Test]
+        public void Vario_NegativeWhenSinking()
+        {
+            var vario = FlightInstruments.CalcVarioMps(90f, 100f, 2f);
+            Assert.AreEqual(-5f, vario, 0.01f);
         }
     }
 }

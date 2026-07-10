@@ -42,4 +42,7 @@ crashlytics-build.properties
 
 # Unity package resolve logs
 unity-package-resolve.log
-Packages/com.meta.xr.sdk.core/
+
+# Embedded vendor packages (resolved via manifest)
+Packages/com.meta.xr.*/
+Packages/com.unity.*/

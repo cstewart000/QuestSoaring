@@ -16,8 +16,8 @@ See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for milestones and architecture.
 1. Clone this repo.
 2. Open folder in Unity Hub → **2022.3 LTS** → 3D (URP) if ProjectSettings need regeneration.
 3. Install Meta XR SDK via [Meta developer docs](https://developer.oculus.com/documentation/unity/unity-package-manager/).
-4. Open `Assets/Scenes/Main.unity` (create scene after first open if missing).
-5. Add `GliderController`, `VRGliderInput`, `Rigidbody` to glider root; tag player transform for terrain.
+4. Open `Assets/Scenes/Main.unity` and press **Play** (desktop: W/S pitch, A/D roll, Q/E rudder).
+5. For Quest VR: menu **Quest Soaring → Setup Main Scene** to wire OVRCameraRig, then build to device.
 
 ## Tests
 
