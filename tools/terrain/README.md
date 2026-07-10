@@ -1,37 +1,30 @@
 # Terrain tools (no Unity required)
 
-Preview and export the same procedural terrain used in-game.
-
-## Browser 3D preview
+## Quick start (recommended)
 
 ```bash
-cd tools/terrain
-python3 -m http.server 8765
+python3 tools/terrain/serve.py
 ```
 
-Open http://localhost:8765/preview.html
+Opens http://127.0.0.1:8765/preview_standalone.html automatically.
 
-- Low-poly chunked terrain (16×16 verts per chunk, 256 m tiles)
-- Same octave Perlin params as `HeightNoise.cs` (scale 800, 4 octaves, ×400)
-- **Drag** orbit · **Scroll** zoom · **WASD** pan (streams chunks like Unity)
+## Troubleshooting
 
-## Export heightmap + OBJ
+| Problem | Fix |
+|---------|-----|
+| Blank page / module errors | **Don't double-click the HTML file.** Must use `serve.py` |
+| `Address already in use` | `serve.py` tries 8766, 8767, 9080 automatically |
+| "Load failed" / Three.js | Need internet for CDN (unpkg.com) |
+| Still broken | Try: `cd tools/terrain && python3 serve.py` |
+
+## Export (no server needed)
 
 ```bash
 python3 tools/terrain/export_terrain.py tools/terrain/export
 ```
 
-Outputs:
-- `heightmap_c0_0.png` — grayscale height preview
-- `terrain_c0_0.obj` — mesh for Blender / MeshLab
+Opens `terrain_c0_0.obj` in Blender if preview won't run.
 
-## Files
+## Legacy multi-file preview
 
-| File | Role |
-|------|------|
-| `height_noise.js` | Height sampling (JS port) |
-| `chunk_mesh.js` | Chunk mesh builder + streaming coords |
-| `preview.html` | Three.js viewer |
-| `export_terrain.py` | PNG + OBJ export |
-
-**Note:** Perlin RNG seed differs from Unity's internal permutation, so shapes will be *similar* but not pixel-identical to in-engine terrain. Algorithm structure matches.
+`preview.html` + `chunk_mesh.js` — same server, use `/preview.html` instead.
