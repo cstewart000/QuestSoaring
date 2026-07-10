@@ -20,10 +20,10 @@ namespace QuestSoaring.Weather
 
         public static Vector3 SampleTerrainNormal(float x, float z, float sampleStep = 8f)
         {
-            var hL = HeightNoise.Sample(x - sampleStep, z, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
-            var hR = HeightNoise.Sample(x + sampleStep, z, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
-            var hD = HeightNoise.Sample(x, z - sampleStep, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
-            var hU = HeightNoise.Sample(x, z + sampleStep, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
+            var hL = HeightNoise.Sample(x - sampleStep, z);
+            var hR = HeightNoise.Sample(x + sampleStep, z);
+            var hD = HeightNoise.Sample(x, z - sampleStep);
+            var hU = HeightNoise.Sample(x, z + sampleStep);
             return new Vector3(hL - hR, 2f * sampleStep, hD - hU).normalized;
         }
     }

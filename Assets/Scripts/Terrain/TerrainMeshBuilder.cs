@@ -3,41 +3,30 @@ using UnityEngine;
 
 namespace QuestSoaring.Terrain
 {
-    /// <summary>Flat-shaded low-poly mesh with grayscale vertex colors.</summary>
     public static class TerrainMeshBuilder
     {
         public static void BuildFlatMesh(Mesh mesh, Vector2Int coord, float chunkSize, int res)
         {
+            var field = TerrainHeightField.GetChunk(coord);
             var origin = new Vector3(coord.x * chunkSize, 0f, coord.y * chunkSize);
-            var heights = new float[res * res];
-            for (var z = 0; z < res; z++)
-            for (var x = 0; x < res; x++)
-            {
-                var wx = origin.x + x * chunkSize / (res - 1);
-                var wz = origin.z + z * chunkSize / (res - 1);
-                heights[z * res + x] = HeightNoise.Sample(wx, wz);
-            }
-
             var verts = new List<Vector3>();
             var colors = new List<Color>();
             var tris = new List<int>();
 
-            void AddTri(int x0, int z0, int x1, int z1, int x2, int z2)
+            void AddTri(float wx0, float wz0, float wx1, float wz1, float wx2, float wz2)
             {
-                Vector3 Pos(int x, int z)
-                {
-                    var wx = origin.x + x * chunkSize / (res - 1);
-                    var wz = origin.z + z * chunkSize / (res - 1);
-                    return new Vector3(wx, heights[z * res + x], wz);
-                }
-                var a = Pos(x0, z0);
-                var b = Pos(x1, z1);
-                var c = Pos(x2, z2);
+                var y0 = field.SampleHeight(wx0, wz0);
+                var y1 = field.SampleHeight(wx1, wz1);
+                var y2 = field.SampleHeight(wx2, wz2);
+                var a = new Vector3(wx0, y0, wz0);
+                var b = new Vector3(wx1, y1, wz1);
+                var c = new Vector3(wx2, y2, wz2);
                 var slope = 1f - Vector3.Dot(Vector3.Cross(b - a, c - a).normalized, Vector3.up);
-                var avgY = (a.y + b.y + c.y) / 3f;
-                var cx = (a.x + b.x + c.x) / 3f;
-                var cz = (a.z + b.z + c.z) / 3f;
-                var col = TerrainStyle.SurfaceColor(cx, cz, avgY, slope);
+                var cx = (wx0 + wx1 + wx2) / 3f;
+                var cz = (wz0 + wz1 + wz2) / 3f;
+                var cy = (y0 + y1 + y2) / 3f;
+                var flow = field.SampleFlow(cx, cz);
+                var col = BiomeMap.GetColor(cx, cz, cy, slope, flow);
                 var i = verts.Count;
                 verts.Add(a); verts.Add(b); verts.Add(c);
                 colors.Add(col); colors.Add(col); colors.Add(col);
@@ -47,8 +36,12 @@ namespace QuestSoaring.Terrain
             for (var z = 0; z < res - 1; z++)
             for (var x = 0; x < res - 1; x++)
             {
-                AddTri(x, z, x, z + 1, x + 1, z);
-                AddTri(x + 1, z, x, z + 1, x + 1, z + 1);
+                var wx0 = origin.x + x * chunkSize / (res - 1);
+                var wz0 = origin.z + z * chunkSize / (res - 1);
+                var wx1 = origin.x + (x + 1) * chunkSize / (res - 1);
+                var wz1 = origin.z + (z + 1) * chunkSize / (res - 1);
+                AddTri(wx0, wz0, wx0, wz1, wx1, wz0);
+                AddTri(wx1, wz0, wx0, wz1, wx1, wz1);
             }
 
             mesh.Clear();
@@ -56,7 +49,7 @@ namespace QuestSoaring.Terrain
             mesh.triangles = tris.ToArray();
             mesh.colors = colors.ToArray();
             mesh.RecalculateBounds();
-            Debug.Log($"[TerrainMeshBuilder] Flat chunk {coord} — {tris.Count / 3} tris");
+            Debug.Log($"[TerrainMeshBuilder] Eroded chunk {coord}");
         }
     }
 }

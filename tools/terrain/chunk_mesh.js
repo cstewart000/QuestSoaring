@@ -1,50 +1,57 @@
-import { sampleHeight, biomeColor, MAX_H } from './height_noise.js';
+import { getChunk, biomeColor, CHUNK, MAX_H } from './height_field.js';
 
 const RES = 16;
-const CHUNK = 256;
 export { CHUNK, MAX_H };
 
-function pos(originX, originZ, x, z, heights, res) {
-  const wx = originX + x * CHUNK / (res - 1);
-  const wz = originZ + z * CHUNK / (res - 1);
-  return [wx, heights[z * res + x], wz];
-}
-
 export function buildChunkMesh(coordX, coordZ) {
-  const originX = coordX * CHUNK, originZ = coordZ * CHUNK;
-  const heights = new Float32Array(RES * RES);
-  for (let z = 0; z < RES; z++)
-    for (let x = 0; x < RES; x++) {
-      const wx = originX + x * CHUNK / (RES - 1);
-      const wz = originZ + z * CHUNK / (RES - 1);
-      heights[z * RES + x] = sampleHeight(wx, wz);
-    }
-
+  const field = getChunk(coordX, coordZ);
+  const ox = coordX * CHUNK, oz = coordZ * CHUNK;
   const verts = [], colors = [], tris = [];
-  function addTri(x0, z0, x1, z1, x2, z2) {
-    const a = pos(originX, originZ, x0, z0, heights, RES);
-    const b = pos(originX, originZ, x1, z1, heights, RES);
-    const c = pos(originX, originZ, x2, z2, heights, RES);
-    const ab = [b[0]-a[0], b[1]-a[1], b[2]-a[2]];
-    const ac = [c[0]-a[0], c[1]-a[1], c[2]-a[2]];
+
+  function addTri(wx0, wz0, wx1, wz1, wx2, wz2) {
+    const y0 = bilinear(field, wx0, wz0);
+    const y1 = bilinear(field, wx1, wz1);
+    const y2 = bilinear(field, wx2, wz2);
+    const ab = [wx1 - wx0, y1 - y0, wz1 - wz0], ac = [wx2 - wx0, y2 - y0, wz2 - wz0];
     const nx = ab[1]*ac[2]-ab[2]*ac[1], ny = ab[2]*ac[0]-ab[0]*ac[2], nz = ab[0]*ac[1]-ab[1]*ac[0];
-    const len = Math.hypot(nx, ny, nz) || 1;
-    const slope = 1 - ny / len;
-    const avgY = (a[1] + b[1] + c[1]) / 3;
-    const cx = (a[0] + b[0] + c[0]) / 3, cz = (a[2] + b[2] + c[2]) / 3;
-    const col = biomeColor(cx, cz, avgY, slope);
+    const slope = 1 - ny / (Math.hypot(nx, ny, nz) || 1);
+    const cx = (wx0+wx1+wx2)/3, cz = (wz0+wz1+wz2)/3, cy = (y0+y1+y2)/3;
+    const flow = bilinearFlow(field, cx, cz);
+    const col = biomeColor(cx, cz, cy, slope, flow);
     const i = verts.length / 3;
-    verts.push(...a, ...b, ...c);
+    verts.push(wx0,y0,wz0, wx1,y1,wz1, wx2,y2,wz2);
     colors.push(...col, ...col, ...col);
-    tris.push(i, i + 1, i + 2);
+    tris.push(i, i+1, i+2);
   }
+
   for (let z = 0; z < RES - 1; z++)
     for (let x = 0; x < RES - 1; x++) {
-      addTri(x, z, x, z + 1, x + 1, z);
-      addTri(x + 1, z, x, z + 1, x + 1, z + 1);
+      const wx0 = ox + x * CHUNK / (RES - 1), wz0 = oz + z * CHUNK / (RES - 1);
+      const wx1 = ox + (x + 1) * CHUNK / (RES - 1), wz1 = oz + (z + 1) * CHUNK / (RES - 1);
+      addTri(wx0, wz0, wx0, wz1, wx1, wz0);
+      addTri(wx1, wz0, wx0, wz1, wx1, wz1);
     }
-  console.log(`[TerrainChunk] Flat chunk (${coordX}, ${coordZ})`);
-  return { verts, tris, colors, key: `${coordX},${coordZ}` };
+  return { verts, tris, colors };
+}
+
+function bilinear(field, wx, wz) {
+  let lx = (wx - field.ox) / field.cell, lz = (wz - field.oz) / field.cell;
+  const gs = field.h.length;
+  lx = Math.max(0, Math.min(gs - 1.001, lx)); lz = Math.max(0, Math.min(gs - 1.001, lz));
+  const x0 = Math.floor(lx), z0 = Math.floor(lz), tx = lx - x0, tz = lz - z0;
+  const a = field.h[x0][z0], b = field.h[Math.min(x0+1,gs-1)][z0];
+  const c = field.h[x0][Math.min(z0+1,gs-1)], d = field.h[Math.min(x0+1,gs-1)][Math.min(z0+1,gs-1)];
+  return (1-tx)*(1-tz)*a + tx*(1-tz)*b + (1-tx)*tz*c + tx*tz*d;
+}
+
+function bilinearFlow(field, wx, wz) {
+  let lx = (wx - field.ox) / field.cell, lz = (wz - field.oz) / field.cell;
+  const gs = field.flow.length;
+  lx = Math.max(0, Math.min(gs - 1.001, lx)); lz = Math.max(0, Math.min(gs - 1.001, lz));
+  const x0 = Math.floor(lx), z0 = Math.floor(lz), tx = lx - x0, tz = lz - z0;
+  const a = field.flow[x0][z0], b = field.flow[Math.min(x0+1,gs-1)][z0];
+  const c = field.flow[x0][Math.min(z0+1,gs-1)], d = field.flow[Math.min(x0+1,gs-1)][Math.min(z0+1,gs-1)];
+  return (1-tx)*(1-tz)*a + tx*(1-tz)*b + (1-tx)*tz*c + tx*tz*d;
 }
 
 export function chunkCoords(camX, camZ, radius = 2) {
@@ -54,5 +61,3 @@ export function chunkCoords(camX, camZ, radius = 2) {
     for (let dx = -radius; dx <= radius; dx++) out.push([cx + dx, cz + dz]);
   return out;
 }
-
-export const RES_EXPORT = RES;

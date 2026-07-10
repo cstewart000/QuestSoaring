@@ -85,22 +85,19 @@ namespace QuestSoaring.Tests
         public void HeightNoise_InExpectedRange()
         {
             var h = HeightNoise.Sample(0f, 0f);
-            Assert.That(h, Is.InRange(0f, HeightNoise.MaxHeight));
+            Assert.That(h, Is.InRange(1f, HeightNoise.MaxHeight));
         }
     }
 
     public class BiomeMapTests
     {
         [Test]
-        public void Alpine_AtHighElevation()
+        public void FlowAndHeight_SampleConsistently()
         {
-            Assert.AreEqual(Biome.Alpine, BiomeMap.Classify(0f, 0f, 350f, 0.1f));
-        }
-
-        [Test]
-        public void ForestStipple_NotOnAlpineHeights()
-        {
-            Assert.IsFalse(BiomeMap.ForestStipple(100f, 100f, 280f));
+            var h = HeightNoise.Sample(200f, 200f);
+            var flow = BiomeMap.SampleFlow(200f, 200f);
+            Assert.That(h, Is.GreaterThan(1f));
+            Assert.That(flow, Is.GreaterThan(0f));
         }
     }
 

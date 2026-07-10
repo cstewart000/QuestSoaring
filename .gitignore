@@ -49,3 +49,6 @@ Packages/com.unity.*/
 
 # Terrain tool exports (regenerate with export_terrain.py)
 tools/terrain/export/*.obj
+
+# Erosion chunk cache (optional)
+tools/terrain/.chunk_cache/
