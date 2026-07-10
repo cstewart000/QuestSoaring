@@ -4,9 +4,9 @@ namespace QuestSoaring.Terrain
 {
     public static class HeightNoise
     {
-        public const float DefaultScale = 680f;
-        public const int DefaultOctaves = 5;
-        public const float MaxHeight = 460f;
+        public const float DefaultScale = 820f;
+        public const int DefaultOctaves = 4;
+        public const float MaxHeight = 420f;
 
         public static float Sample(float x, float z, float scale = DefaultScale, int octaves = DefaultOctaves)
         {
@@ -23,13 +23,13 @@ namespace QuestSoaring.Terrain
             {
                 var p = Mathf.PerlinNoise(x * freq, z * freq);
                 var ridged = 1f - Mathf.Abs(p * 2f - 1f);
-                var n = ridged * 0.68f + p * 0.32f;
+                var n = ridged * 0.32f + p * 0.68f;
                 h += n * amp;
                 ampSum += amp;
-                amp *= 0.52f;
-                freq *= 2.08f;
+                amp *= 0.48f;
+                freq *= 1.95f;
             }
-            var norm = Mathf.Pow(Mathf.Clamp01(h / ampSum), 1.1f);
+            var norm = Mathf.Pow(Mathf.Clamp01(h / ampSum), 0.98f);
             return norm * MaxHeight;
         }
     }

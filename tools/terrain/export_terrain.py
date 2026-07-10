@@ -5,7 +5,7 @@ import struct
 import sys
 import zlib
 
-SCALE, OCTAVES, MAX_H = 680.0, 5, 460.0
+SCALE, OCTAVES, MAX_H = 820.0, 4, 420.0
 RES, CHUNK = 64, 256
 
 
@@ -32,15 +32,13 @@ def sample_height(x, z):
     for _ in range(OCTAVES):
         p = perlin(x * freq, z * freq)
         ridged = 1 - abs(p * 2 - 1)
-        n = ridged * 0.55 + p * 0.45
+        n = ridged * 0.32 + p * 0.68
         h += n * amp
         amp_sum += amp
-        amp *= 0.52
-        freq *= 2.05
-    base = (max(0.0, min(1.0, h / amp_sum)) ** 1.04) * MAX_H
-    valley = valley_mask(x, z)
-    river = river_mask(x, z)
-    carve = valley * 75 + river * max(60, 130 - base * 0.12)
+        amp *= 0.48
+        freq *= 1.95
+    base = (max(0.0, min(1.0, h / amp_sum)) ** 0.98) * MAX_H
+    carve = valley_mask(x, z) * 55 + river_mask(x, z) * max(45, 100 - base * 0.1)
     return max(1.2, base - carve)
 
 

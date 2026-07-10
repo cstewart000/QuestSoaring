@@ -11,7 +11,7 @@ namespace QuestSoaring.Terrain
         {
             var valley = ValleyMask(x, z);
             var river = RiverMask(x, z);
-            var carve = valley * 75f + river * Mathf.Max(60f, 130f - baseH * 0.12f);
+            var carve = valley * 55f + river * Mathf.Max(45f, 100f - baseH * 0.1f);
             return Mathf.Max(1.2f, baseH - carve);
         }
 
@@ -52,12 +52,12 @@ namespace QuestSoaring.Terrain
         public static Color GetColor(float x, float z, float y, float slope)
         {
             var speck = Mathf.PerlinNoise(x * 0.11f, z * 0.11f);
-            if (RiverMask(x, z) > 0.28f && y < 155f) return Gray(0.99f);
-            if (ForestStipple(x, z, y)) return Gray(0.24f + speck * 0.1f);
-            if (y < 125f && slope < 0.32f) return Gray(0.94f);
-            if (y > 270f) return Gray(0.97f + speck * 0.03f);
-            if (slope > 0.38f) return Gray(0.9f - slope * 0.12f);
-            return Gray(0.965f);
+            if (RiverMask(x, z) > 0.28f && y < 155f) return Gray(0.84f);
+            if (ForestStipple(x, z, y)) return Gray(0.44f + speck * 0.08f);
+            if (y < 125f && slope < 0.32f) return Gray(0.76f);
+            if (y > 270f) return Gray(0.82f + speck * 0.04f);
+            if (slope > 0.38f) return Gray(0.74f - slope * 0.06f);
+            return Gray(0.8f);
         }
 
         static Color Gray(float v) => new Color(v, v, v);

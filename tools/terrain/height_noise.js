@@ -1,7 +1,7 @@
-/** Height + biomes — matches concept_art/image (1).jpg */
-export const MAX_H = 460;
-export const SCALE = 680;
-export const OCTAVES = 5;
+/** Height + biomes — light gray palette, gentle rolling terrain */
+export const MAX_H = 420;
+export const SCALE = 820;
+export const OCTAVES = 4;
 
 export function sampleHeight(x, z) {
   return applyValleysRivers(baseHeight(x, z), x, z);
@@ -12,13 +12,13 @@ function baseHeight(x, z) {
   for (let i = 0; i < OCTAVES; i++) {
     const p = perlin(x * freq, z * freq);
     const ridged = 1 - Math.abs(p * 2 - 1);
-    const n = ridged * 0.68 + p * 0.32;
+    const n = ridged * 0.32 + p * 0.68;
     h += n * amp;
     ampSum += amp;
-    amp *= 0.52;
-    freq *= 2.08;
+    amp *= 0.48;
+    freq *= 1.95;
   }
-  return Math.pow(Math.min(1, h / ampSum), 1.1) * MAX_H;
+  return Math.pow(Math.min(1, h / ampSum), 0.98) * MAX_H;
 }
 
 export function forestStipple(x, z, y) {
@@ -42,18 +42,18 @@ export function riverMask(x, z) {
 }
 
 function applyValleysRivers(baseH, x, z) {
-  const carve = valleyMask(x, z) * 75 + riverMask(x, z) * Math.max(60, 130 - baseH * 0.12);
+  const carve = valleyMask(x, z) * 55 + riverMask(x, z) * Math.max(45, 100 - baseH * 0.1);
   return Math.max(1.2, baseH - carve);
 }
 
 export function biomeColor(x, z, y, slope) {
   const speck = perlin(x * 0.11, z * 0.11);
-  if (riverMask(x, z) > 0.28 && y < 155) return gray(0.99);
-  if (forestStipple(x, z, y)) return gray(0.24 + speck * 0.1);
-  if (y < 125 && slope < 0.32) return gray(0.94);
-  if (y > 270) return gray(0.97 + speck * 0.03);
-  if (slope > 0.38) return gray(0.9 - slope * 0.12);
-  return gray(0.965);
+  if (riverMask(x, z) > 0.28 && y < 155) return gray(0.84);
+  if (forestStipple(x, z, y)) return gray(0.44 + speck * 0.08);
+  if (y < 125 && slope < 0.32) return gray(0.76);
+  if (y > 270) return gray(0.82 + speck * 0.04);
+  if (slope > 0.38) return gray(0.74 - slope * 0.06);
+  return gray(0.8);
 }
 
 const gray = v => { v = clamp(v); return [v, v, v]; };

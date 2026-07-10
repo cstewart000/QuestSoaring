@@ -19,7 +19,7 @@
 <body>
   <div id="hud">
     <strong>Terrain Preview</strong> · ref: concept_art/image (1).jpg<br>
-    <span style="opacity:0.8">High-key white · dark forest stipple · wireframe edges</span><br>
+    <span style="opacity:0.8">Light gray facets · gentle rolling hills · soft forest patches</span><br>
     <kbd>Drag</kbd> orbit · <kbd>Scroll</kbd> zoom · <kbd>WASD</kbd> pan<br>
     <span id="stats">Loading…</span>
     <div id="err"></div>
@@ -39,10 +39,10 @@
       const THREE = await import('three');
       const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
 
-      const sky = 0xfafafa;
+      const sky = 0xe4e6ea;
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(sky);
-      scene.fog = new THREE.FogExp2(0xf5f5f5, 0.00022);
+      scene.fog = new THREE.FogExp2(0xe8eaee, 0.00022);
 
       const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 1, 5000);
       camera.position.set(420, 480, 520);
@@ -59,7 +59,7 @@
       const chunks = new Map(), root = new THREE.Group();
       scene.add(root);
       const fillMat = new THREE.MeshBasicMaterial({ vertexColors: true, flatShading: true });
-      const edgeMat = new THREE.LineBasicMaterial({ color: 0x2a2a2a, transparent: true, opacity: 0.42 });
+      const edgeMat = new THREE.LineBasicMaterial({ color: 0x666666, transparent: true, opacity: 0.35 });
 
       function addChunk(cx, cz) {
         const k = `${cx},${cz}`;
