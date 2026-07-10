@@ -1,3 +1,4 @@
+using QuestSoaring.SceneSetup;
 using UnityEngine;
 
 namespace QuestSoaring.Aerodynamics
@@ -27,7 +28,7 @@ namespace QuestSoaring.Aerodynamics
             var col = go.GetComponent<Collider>();
             if (col) Object.Destroy(col);
             var rend = go.GetComponent<Renderer>();
-            rend.material = new Material(Shader.Find("Universal Render Pipeline/Lit")) { color = color };
+            rend.material = RenderUtil.CreateLitMaterial(color);
         }
     }
 }

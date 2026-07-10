@@ -6,12 +6,10 @@ namespace QuestSoaring.SceneSetup
     public class SceneBootstrap : MonoBehaviour
     {
         [SerializeField] bool _buildOnAwake = true;
-        static bool _built;
 
         void Awake()
         {
-            if (!_buildOnAwake || _built) return;
-            _built = true;
+            if (!_buildOnAwake) return;
             Build();
         }
 
@@ -22,7 +20,6 @@ namespace QuestSoaring.SceneSetup
                 Debug.Log("[SceneBootstrap] World already built, skipping");
                 return;
             }
-            _built = true;
             Debug.Log("[SceneBootstrap] Building Main scene...");
             var root = new GameObject("QuestSoaringWorld").transform;
             WorldFactory.CreateSun(root);

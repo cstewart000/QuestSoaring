@@ -9,6 +9,11 @@ namespace QuestSoaring.SceneSetup
     {
         public static void Apply(Transform parent)
         {
+            if (!RenderUtil.IsUrpActive)
+            {
+                Debug.LogWarning("[GrayscalePostSetup] URP not active — run Quest Soaring → Setup URP Pipeline");
+                return;
+            }
             var go = new GameObject("GrayscaleVolume");
             go.transform.SetParent(parent);
             var volume = go.AddComponent<Volume>();

@@ -11,6 +11,8 @@ See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for milestones and architecture.
 - XR Interaction Toolkit, XR Hands
 - Meta Quest 3 / 3S for device testing
 
+See [docs/FIRST_RUN.md](docs/FIRST_RUN.md) for the pre-play checklist.
+
 ## Quick Start
 
 1. Clone this repo.

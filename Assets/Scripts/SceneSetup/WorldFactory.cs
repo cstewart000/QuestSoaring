@@ -8,9 +8,7 @@ namespace QuestSoaring.SceneSetup
     {
         public static Material CreateTerrainMaterial()
         {
-            var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            mat.color = new Color(0.55f, 0.55f, 0.58f);
-            return mat;
+            return RenderUtil.CreateLitMaterial(new Color(0.55f, 0.55f, 0.58f));
         }
 
         public static ThermalField CreateThermals(Transform parent)
