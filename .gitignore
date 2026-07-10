@@ -39,3 +39,7 @@ Thumbs.db
 
 # Crash reports
 crashlytics-build.properties
+
+# Unity package resolve logs
+unity-package-resolve.log
+Packages/com.meta.xr.sdk.core/
