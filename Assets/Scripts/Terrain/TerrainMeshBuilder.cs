@@ -35,7 +35,9 @@ namespace QuestSoaring.Terrain
                 var c = Pos(x2, z2);
                 var slope = 1f - Vector3.Dot(Vector3.Cross(b - a, c - a).normalized, Vector3.up);
                 var avgY = (a.y + b.y + c.y) / 3f;
-                var col = TerrainStyle.HeightToGray(avgY, slope);
+                var cx = (a.x + b.x + c.x) / 3f;
+                var cz = (a.z + b.z + c.z) / 3f;
+                var col = TerrainStyle.SurfaceColor(cx, cz, avgY, slope);
                 var i = verts.Count;
                 verts.Add(a); verts.Add(b); verts.Add(c);
                 colors.Add(col); colors.Add(col); colors.Add(col);

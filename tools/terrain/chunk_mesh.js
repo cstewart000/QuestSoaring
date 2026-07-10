@@ -1,4 +1,4 @@
-import { sampleHeight, heightToGray, MAX_H } from './height_noise.js';
+import { sampleHeight, biomeColor, MAX_H } from './height_noise.js';
 
 const RES = 16;
 const CHUNK = 256;
@@ -31,7 +31,8 @@ export function buildChunkMesh(coordX, coordZ) {
     const len = Math.hypot(nx, ny, nz) || 1;
     const slope = 1 - ny / len;
     const avgY = (a[1] + b[1] + c[1]) / 3;
-    const col = heightToGray(avgY, slope);
+    const cx = (a[0] + b[0] + c[0]) / 3, cz = (a[2] + b[2] + c[2]) / 3;
+    const col = biomeColor(cx, cz, avgY, slope);
     const i = verts.length / 3;
     verts.push(...a, ...b, ...c);
     colors.push(...col, ...col, ...col);

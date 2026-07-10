@@ -76,16 +76,31 @@ namespace QuestSoaring.Tests
         [Test]
         public void HeightNoise_IsDeterministic()
         {
-            var a = HeightNoise.Sample(120f, 340f, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
-            var b = HeightNoise.Sample(120f, 340f, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
+            var a = HeightNoise.Sample(120f, 340f);
+            var b = HeightNoise.Sample(120f, 340f);
             Assert.AreEqual(a, b);
         }
 
         [Test]
         public void HeightNoise_InExpectedRange()
         {
-            var h = HeightNoise.Sample(0f, 0f, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
+            var h = HeightNoise.Sample(0f, 0f);
             Assert.That(h, Is.InRange(0f, HeightNoise.MaxHeight));
+        }
+    }
+
+    public class BiomeMapTests
+    {
+        [Test]
+        public void Alpine_AtHighElevation()
+        {
+            Assert.AreEqual(Biome.Alpine, BiomeMap.Classify(0f, 0f, 350f, 0.1f));
+        }
+
+        [Test]
+        public void Forest_InMidBand()
+        {
+            Assert.AreEqual(Biome.Forest, BiomeMap.Classify(100f, 100f, 180f, 0.2f));
         }
     }
 

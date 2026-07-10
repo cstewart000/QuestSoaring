@@ -5,8 +5,43 @@ import struct
 import sys
 import zlib
 
-SCALE, OCTAVES, MAX_H = 620.0, 5, 480.0
+SCALE, OCTAVES, MAX_H = 680.0, 5, 460.0
 RES, CHUNK = 64, 256
+
+
+def smooth(t, a, b):
+    t = max(0.0, min(1.0, (t - a) / (b - a)))
+    return t
+
+
+def valley_mask(x, z):
+    macro = perlin(x * 0.00085, z * 0.00085)
+    return smooth(macro, 0.42, 0.58) * (1 - smooth(macro, 0.68, 0.82))
+
+
+def river_mask(x, z):
+    def ch(ox, oz):
+        c = perlin(x * 0.0024 + ox, z * 0.0024 + oz)
+        return max(0.0, min(1.0, 1 - abs(c - 0.5) * 9))
+    r = max(ch(12, 8), ch(140, 95), ch(260, 180))
+    return r * r
+
+
+def sample_height(x, z):
+    h, amp, freq, amp_sum = 0.0, 1.0, 1.0 / SCALE, 0.0
+    for _ in range(OCTAVES):
+        p = perlin(x * freq, z * freq)
+        ridged = 1 - abs(p * 2 - 1)
+        n = ridged * 0.55 + p * 0.45
+        h += n * amp
+        amp_sum += amp
+        amp *= 0.52
+        freq *= 2.05
+    base = (max(0.0, min(1.0, h / amp_sum)) ** 1.04) * MAX_H
+    valley = valley_mask(x, z)
+    river = river_mask(x, z)
+    carve = valley * 75 + river * max(60, 130 - base * 0.12)
+    return max(1.2, base - carve)
 
 
 def fade(t):
@@ -41,19 +76,6 @@ def perlin(x, y):
     ab = grad(hash2(xi, yi + 1), xf, yf - 1)
     bb = grad(hash2(xi + 1, yi + 1), xf - 1, yf - 1)
     return lerp(lerp(aa, ba, u), lerp(ab, bb, u), v) * 0.5 + 0.5
-
-
-def sample_height(x, z):
-    h, amp, freq, amp_sum = 0.0, 1.0, 1.0 / SCALE, 0.0
-    for _ in range(OCTAVES):
-        n = perlin(x * freq, z * freq)
-        n = 1 - abs(n * 2 - 1)
-        h += n * n * amp
-        amp_sum += amp
-        amp *= 0.52
-        freq *= 2.1
-    norm = max(0.0, min(1.0, h / amp_sum))
-    return (norm ** 1.28) * MAX_H
 
 
 def write_png(path, w, h, gray_bytes):
