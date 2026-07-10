@@ -11,6 +11,12 @@ namespace QuestSoaring.Terrain
 
         readonly System.Collections.Generic.Dictionary<Vector2Int, TerrainChunk> _chunks = new();
 
+        public void Init(Transform follow, Material mat)
+        {
+            _followTarget = follow;
+            _chunkMaterial = mat;
+        }
+
         void Update()
         {
             if (_followTarget == null) return;

@@ -46,6 +46,12 @@ namespace QuestSoaring.Weather
         [SerializeField] ThermalField _field;
         [SerializeField] Rigidbody _rb;
 
+        public void Init(ThermalField field, Rigidbody rb)
+        {
+            _field = field;
+            _rb = rb;
+        }
+
         void FixedUpdate()
         {
             if (_field == null || _rb == null) return;
