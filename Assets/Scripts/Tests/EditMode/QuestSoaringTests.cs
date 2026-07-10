@@ -98,9 +98,9 @@ namespace QuestSoaring.Tests
         }
 
         [Test]
-        public void Forest_InMidBand()
+        public void ForestStipple_NotOnAlpineHeights()
         {
-            Assert.AreEqual(Biome.Forest, BiomeMap.Classify(100f, 100f, 180f, 0.2f));
+            Assert.IsFalse(BiomeMap.ForestStipple(100f, 100f, 280f));
         }
     }
 

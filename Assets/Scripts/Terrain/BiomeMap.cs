@@ -4,6 +4,7 @@ namespace QuestSoaring.Terrain
 {
     public enum Biome { Alpine, Forest, Valley, River, Cliff }
 
+    /// <summary>Palette matched to concept_art/image (1).jpg — high-key white + gray stipple.</summary>
     public static class BiomeMap
     {
         public static float ApplyValleysAndRivers(float baseH, float x, float z)
@@ -25,44 +26,40 @@ namespace QuestSoaring.Terrain
             float Channel(float ox, float oz)
             {
                 var c = Mathf.PerlinNoise(x * 0.0024f + ox, z * 0.0024f + oz);
-                var d = 1f - Mathf.Abs(c - 0.5f) * 9f;
-                return Mathf.Clamp01(d);
+                return Mathf.Clamp01(1f - Mathf.Abs(c - 0.5f) * 9f);
             }
             var r = Mathf.Max(Channel(12f, 8f), Channel(140f, 95f), Channel(260f, 180f));
             return r * r;
         }
 
+        public static bool ForestStipple(float x, float z, float y)
+        {
+            if (y > 230f || y < 35f) return false;
+            var patch = Mathf.PerlinNoise(x * 0.022f, z * 0.022f);
+            var fine = Mathf.PerlinNoise(x * 0.19f + 41f, z * 0.19f + 17f);
+            return patch > 0.46f && fine > 0.58f;
+        }
+
         public static Biome Classify(float x, float z, float y, float slope)
         {
             if (RiverMask(x, z) > 0.35f && y < 140f) return Biome.River;
-            if (slope > 0.52f) return Biome.Cliff;
-            if (y > 300f) return Biome.Alpine;
-            if (y < 135f && slope < 0.38f) return Biome.Valley;
-            if (y >= 85f && y <= 295f && slope < 0.42f) return Biome.Forest;
-            return y > 200f ? Biome.Alpine : Biome.Valley;
+            if (ForestStipple(x, z, y)) return Biome.Forest;
+            if (y > 280f || slope > 0.48f) return Biome.Alpine;
+            if (y < 130f && slope < 0.35f) return Biome.Valley;
+            return Biome.Alpine;
         }
 
         public static Color GetColor(float x, float z, float y, float slope)
         {
-            var b = Classify(x, z, y, slope);
-            var speck = Mathf.PerlinNoise(x * 0.07f, z * 0.07f);
-            var g = b switch
-            {
-                Biome.River => 0.44f,
-                Biome.Cliff => 0.52f,
-                Biome.Valley => 0.82f,
-                Biome.Forest => 0.56f + speck * 0.07f,
-                Biome.Alpine => 0.94f + speck * 0.06f,
-                _ => 0.75f
-            };
-            return LiftGray(g);
+            var speck = Mathf.PerlinNoise(x * 0.11f, z * 0.11f);
+            if (RiverMask(x, z) > 0.28f && y < 155f) return Gray(0.99f);
+            if (ForestStipple(x, z, y)) return Gray(0.24f + speck * 0.1f);
+            if (y < 125f && slope < 0.32f) return Gray(0.94f);
+            if (y > 270f) return Gray(0.97f + speck * 0.03f);
+            if (slope > 0.38f) return Gray(0.9f - slope * 0.12f);
+            return Gray(0.965f);
         }
 
-        static Color LiftGray(float v)
-        {
-            v = Mathf.Lerp(v, 1f, 0.1f);
-            v = Mathf.Clamp01((v - 0.5f) * 0.85f + 0.62f);
-            return new Color(v, v, v);
-        }
+        static Color Gray(float v) => new Color(v, v, v);
     }
 }

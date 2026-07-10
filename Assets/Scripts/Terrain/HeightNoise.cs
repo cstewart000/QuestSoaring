@@ -23,13 +23,13 @@ namespace QuestSoaring.Terrain
             {
                 var p = Mathf.PerlinNoise(x * freq, z * freq);
                 var ridged = 1f - Mathf.Abs(p * 2f - 1f);
-                var n = ridged * 0.55f + p * 0.45f;
+                var n = ridged * 0.68f + p * 0.32f;
                 h += n * amp;
                 ampSum += amp;
                 amp *= 0.52f;
-                freq *= 2.05f;
+                freq *= 2.08f;
             }
-            var norm = Mathf.Pow(Mathf.Clamp01(h / ampSum), 1.04f);
+            var norm = Mathf.Pow(Mathf.Clamp01(h / ampSum), 1.1f);
             return norm * MaxHeight;
         }
     }

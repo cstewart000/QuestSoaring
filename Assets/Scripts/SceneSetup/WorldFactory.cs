@@ -11,7 +11,7 @@ namespace QuestSoaring.SceneSetup
             var shader = Shader.Find("QuestSoaring/TerrainVertexColor")
                 ?? Shader.Find("Universal Render Pipeline/Unlit");
             var mat = new Material(shader);
-            if (mat.HasProperty("_Brightness")) mat.SetFloat("_Brightness", 1.12f);
+            if (mat.HasProperty("_Brightness")) mat.SetFloat("_Brightness", 1.0f);
             Debug.Log("[WorldFactory] Grayscale vertex-color terrain material");
             return mat;
         }

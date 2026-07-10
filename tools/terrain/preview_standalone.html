@@ -5,20 +5,21 @@
   <title>Quest Soaring — Terrain Preview</title>
   <style>
     * { margin: 0; box-sizing: border-box; }
-    body { overflow: hidden; background: #0e1014; font-family: system-ui, sans-serif; }
+    body { overflow: hidden; background: #fafafa; font-family: system-ui, sans-serif; }
     #hud {
-      position: fixed; left: 12px; top: 12px; color: #d8dcd6;
-      background: rgba(18,18,22,0.92); padding: 10px 14px; border-radius: 8px;
-      font-size: 13px; line-height: 1.6; z-index: 10; max-width: 380px;
+      position: fixed; left: 12px; top: 12px; color: #333;
+      background: rgba(255,255,255,0.88); padding: 10px 14px; border-radius: 8px;
+      font-size: 13px; line-height: 1.6; z-index: 10; max-width: 400px;
+      border: 1px solid #ddd;
     }
-    #err { color: #f88; display: none; margin-top: 8px; }
-    kbd { background: #2a2e34; padding: 1px 6px; border-radius: 3px; }
+    #err { color: #c00; display: none; margin-top: 8px; }
+    kbd { background: #eee; padding: 1px 6px; border-radius: 3px; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
   <div id="hud">
-    <strong>Terrain Preview</strong> · high-contrast biomes<br>
-    <span style="opacity:0.85">Near-white alpine · light gray valleys · mid-gray forest · slate rivers</span><br>
+    <strong>Terrain Preview</strong> · ref: concept_art/image (1).jpg<br>
+    <span style="opacity:0.8">High-key white · dark forest stipple · wireframe edges</span><br>
     <kbd>Drag</kbd> orbit · <kbd>Scroll</kbd> zoom · <kbd>WASD</kbd> pan<br>
     <span id="stats">Loading…</span>
     <div id="err"></div>
@@ -38,10 +39,10 @@
       const THREE = await import('three');
       const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
 
-      const sky = 0xc8ccd4;
+      const sky = 0xfafafa;
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(sky);
-      scene.fog = new THREE.FogExp2(sky, 0.00055);
+      scene.fog = new THREE.FogExp2(0xf5f5f5, 0.00022);
 
       const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 1, 5000);
       camera.position.set(420, 480, 520);
@@ -55,14 +56,10 @@
       controls.enableDamping = true;
       controls.maxPolarAngle = Math.PI * 0.48;
 
-      scene.add(new THREE.HemisphereLight(0xd8dce4, 0x3a4048, 0.65));
-      const sun = new THREE.DirectionalLight(0xffffff, 0.95);
-      sun.position.set(-120, 280, 180);
-      scene.add(sun);
-
       const chunks = new Map(), root = new THREE.Group();
       scene.add(root);
-      const mat = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
+      const fillMat = new THREE.MeshBasicMaterial({ vertexColors: true, flatShading: true });
+      const edgeMat = new THREE.LineBasicMaterial({ color: 0x2a2a2a, transparent: true, opacity: 0.42 });
 
       function addChunk(cx, cz) {
         const k = `${cx},${cz}`;
@@ -73,16 +70,22 @@
         geo.setAttribute('color', new THREE.Float32BufferAttribute(d.colors, 3));
         geo.setIndex(d.tris);
         geo.computeVertexNormals();
-        root.add(new THREE.Mesh(geo, mat));
-        chunks.set(k, true);
+        const group = new THREE.Group();
+        group.add(new THREE.Mesh(geo, fillMat));
+        group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 12), edgeMat));
+        root.add(group);
+        chunks.set(k, group);
+        console.log('[TerrainPreview] Chunk with wireframe edges', k);
       }
 
       function sync() {
         const t = controls.target;
         const need = new Set(chunkCoords(t.x, t.z, 2).map(([x,z]) => `${x},${z}`));
         need.forEach(k => { const [x,z] = k.split(',').map(Number); addChunk(x, z); });
+        for (const [k, g] of chunks)
+          if (!need.has(k)) { root.remove(g); g.traverse(o => o.geometry?.dispose()); chunks.delete(k); }
         document.getElementById('stats').textContent =
-          `Chunks: ${chunks.size} · ${t.x.toFixed(0)}, ${t.z.toFixed(0)} m · flat grayscale`;
+          `Chunks: ${chunks.size} · ${t.x.toFixed(0)}, ${t.z.toFixed(0)} m`;
       }
 
       sync();
@@ -105,7 +108,7 @@
         controls.update();
         renderer.render(scene, camera);
       })();
-      console.log('[TerrainPreview] Ridged grayscale — chunk', CHUNK);
+      console.log('[TerrainPreview] Concept art style — chunk', CHUNK);
     } catch (e) { fail('Load failed: ' + e.message); }
   </script>
 </body>
