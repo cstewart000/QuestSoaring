@@ -46,3 +46,6 @@ unity-package-resolve.log
 # Embedded vendor packages (resolved via manifest)
 Packages/com.meta.xr.*/
 Packages/com.unity.*/
+
+# Terrain tool exports (regenerate with export_terrain.py)
+tools/terrain/export/*.obj

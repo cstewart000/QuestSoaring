@@ -30,6 +30,16 @@ Open **`docs/asset_gallery.html`** in a browser to browse all visual references.
 | Low-poly VR cockpit concept | `concept_art/content.jpeg` |
 | Generated soaring vista | `docs/generated/quest-soaring-vista.png` |
 | Generated instrument HUD | `docs/generated/quest-soaring-instruments.png` |
+| Terrain heightmap sample | `tools/terrain/export/heightmap_c0_0.png` |
+
+## Terrain preview (outside Unity)
+
+```bash
+cd tools/terrain && python3 -m http.server 8765
+# → http://localhost:8765/preview.html
+```
+
+See [tools/terrain/README.md](../tools/terrain/README.md).
 
 ## Code assets (runtime, no mesh files yet)
 
