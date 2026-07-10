@@ -1,11 +1,13 @@
 {
-  "name": "QuestSoaring.Runtime",
-  "rootNamespace": "QuestSoaring",
+  "name": "QuestSoaring.Editor",
+  "rootNamespace": "QuestSoaring.EditorTools",
   "references": [
-    "Unity.TextMeshPro",
+    "QuestSoaring.Runtime",
     "Unity.RenderPipelines.Universal.Runtime"
   ],
-  "includePlatforms": [],
+  "includePlatforms": [
+    "Editor"
+  ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,
