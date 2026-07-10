@@ -1,0 +1,14 @@
+{
+  "name": "QuestSoaring.Runtime",
+  "rootNamespace": "QuestSoaring",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
