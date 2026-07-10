@@ -48,19 +48,20 @@ namespace QuestSoaring.Terrain
             var speck = Mathf.PerlinNoise(x * 0.07f, z * 0.07f);
             var g = b switch
             {
-                Biome.River => 0.03f,
-                Biome.Cliff => 0.06f,
-                Biome.Valley => 0.2f,
-                Biome.Forest => 0.05f + speck * 0.1f,
-                Biome.Alpine => 0.86f + speck * 0.14f,
-                _ => 0.15f
+                Biome.River => 0.44f,
+                Biome.Cliff => 0.52f,
+                Biome.Valley => 0.82f,
+                Biome.Forest => 0.56f + speck * 0.07f,
+                Biome.Alpine => 0.94f + speck * 0.06f,
+                _ => 0.75f
             };
-            return ContrastGray(g);
+            return LiftGray(g);
         }
 
-        static Color ContrastGray(float v)
+        static Color LiftGray(float v)
         {
-            v = Mathf.Clamp01((v - 0.5f) * 1.75f + 0.5f);
+            v = Mathf.Lerp(v, 1f, 0.1f);
+            v = Mathf.Clamp01((v - 0.5f) * 0.85f + 0.62f);
             return new Color(v, v, v);
         }
     }

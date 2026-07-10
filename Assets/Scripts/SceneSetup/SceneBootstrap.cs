@@ -29,9 +29,9 @@ namespace QuestSoaring.SceneSetup
             var rig = GliderFactory.Create(root, thermals);
             WorldFactory.CreateTerrain(root, rig.Root, mat);
             RenderSettings.fog = true;
-            RenderSettings.fogColor = new Color(0.72f, 0.74f, 0.78f);
+            RenderSettings.fogColor = new Color(0.88f, 0.89f, 0.91f);
             RenderSettings.fogMode = FogMode.Exponential;
-            RenderSettings.fogDensity = 0.00055f;
+            RenderSettings.fogDensity = 0.00035f;
             Debug.Log("[SceneBootstrap] Ready — W/S pitch A/D roll Q/E rudder");
         }
     }

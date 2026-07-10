@@ -55,10 +55,11 @@ export function biomeColor(x, z, y, slope) {
   const b = biomeAt(x, z, y, slope);
   const speck = perlin(x * 0.07, z * 0.07);
   const g = {
-    river: 0.03, cliff: 0.06, valley: 0.2,
-    forest: 0.05 + speck * 0.1, alpine: 0.86 + speck * 0.14
-  }[b] ?? 0.15;
-  const v = clamp((g - 0.5) * 1.75 + 0.5);
+    river: 0.44, cliff: 0.52, valley: 0.82,
+    forest: 0.56 + speck * 0.07, alpine: 0.94 + speck * 0.06
+  }[b] ?? 0.75;
+  let v = g + (1 - g) * 0.1;
+  v = clamp((v - 0.5) * 0.85 + 0.62);
   return [v, v, v];
 }
 
