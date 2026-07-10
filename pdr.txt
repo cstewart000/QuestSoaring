@@ -1,0 +1,69 @@
+Project Design Document (PDR)
+Working Title: Quest Soaring
+Final Title Ideas: Aether Glide, Thermal Drift, Skyweaver (TBD)
+Platform: Meta Quest (Standalone focus, PCVR optional)
+Genre: Realistic-ish VR Glider / Soaring Simulator
+Target Audience: Flight sim enthusiasts, relaxation seekers, VR users who enjoy exploration and skill-based flying
+Tone: Peaceful yet exhilarating, adventurous, meditative
+1. Core Vision
+A beautiful low-poly VR glider simulator where players experience the joy of soaring using realistic heuristic physics. Emphasize freedom, discovery, and mastery of the air using natural VR controls and a stylized low-poly world.
+2. Key Features
+
+Low-Poly Procedural World — Infinite-ish terrain with mountains, valleys, ridges. Chunked generation.
+Heuristic Glider Physics (Condor-inspired feel):
+Lift, drag, stall, induced drag based on AoA and airspeed.
+Thermals, ridge lift, wind, turbulence.
+Multiple glider profiles (beginner vs performance).
+
+VR Controls:
+Controller tilt/rotation = Yoke (Pitch & Roll).
+Controller twist or secondary input = Rudder.
+Physics hands for direct interaction with tow release, air brakes, landing gear, flaps.
+
+Visual Style: Stylized low-poly with grayscale base + subtle color accents. Atmospheric and peaceful.
+Progression / Modes:
+Free flight / exploration
+Thermal hunting challenges
+Cross-country tasks
+Training mode with guided lessons
+
+
+3. Technical Requirements
+
+Engine: Unity 2022 LTS + URP
+Core Packages: Meta XR All-in-One SDK, XR Interaction Toolkit, XR Hands
+Performance Target: Stable 72 FPS on Quest 3 / 3S
+Optimization: Low-poly assets, baked lighting where possible, heuristic physics (no heavy simulation)
+
+4. Key Systems to Build
+
+Procedural Low-Poly Terrain + Chunk Loading
+Heuristic Aerodynamics Controller (main physics script)
+Physics Hands + Interactable Cockpit Levers
+Weather / Thermal System
+VR Input Mapping (yoke + rudder)
+Basic UI / Instruments (vario, altimeter, etc.)
+Saving / Settings
+
+5. Art Direction
+
+Low-poly aesthetic
+Grayscale dominant with soft accent colors (teal, orange, purple skies)
+Clean, readable instruments
+
+6. Initial Milestones
+MVP (Minimum Viable Product):
+
+Basic glider physics + flying
+Simple procedural terrain
+Physics hands + 2-3 interactable levers
+Yoke + rudder controls
+Grayscale post-processing
+
+Polish Phase:
+
+Advanced thermals & wind
+Multiple gliders
+More world variety
+Sound design (wind, fabric, vario beeps)
+Menu + progression

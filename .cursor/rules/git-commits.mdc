@@ -1,0 +1,38 @@
+---
+description: Commit to git after each major Quest Soaring change
+alwaysApply: true
+---
+
+# Git commit discipline
+
+After each **major change** in Quest Soaring, create a git commit before moving on.
+
+## What counts as major
+
+- New system or milestone (physics, terrain, VR input, weather, tests)
+- New scene, prefab, or test assembly
+- Refactor touching multiple scripts or project settings
+- Bug fix that changes gameplay or test behavior
+
+## What does NOT need its own commit
+
+- Typo in comment, formatting-only edits
+- WIP within the same feature (squash into one commit when done)
+
+## Commit message style
+
+Use imperative mood, one line summary + optional body:
+
+```
+Add glider aerodynamics model and EditMode tests
+
+Heuristic lift/drag/stall based on AoA and airspeed.
+```
+
+## Workflow
+
+1. Finish a logical unit of work
+2. Run EditMode tests when scripts changed
+3. `git add` relevant files only (never `.env`, `Library/`, `UserSettings/`)
+4. Commit with descriptive message
+5. Push when remote exists and user asks or at end of session milestone
