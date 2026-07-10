@@ -21,7 +21,8 @@ Based on `pdr.txt`. Unity 2022 LTS + URP, Meta Quest standalone.
 ### M3 — World
 - [x] `ProceduralTerrain` — chunked low-poly heightmap mesh
 - [x] `TerrainChunk` — load/unload by player position
-- [ ] Ridge lift from terrain normal vs wind
+- [x] Ridge lift from terrain normal vs wind
+- [x] Wind layers (altitude-based) + ridge lift appliers
 - [ ] Accent colors on horizon (teal/orange/purple gradients)
 
 ### M4 — Interaction
@@ -32,6 +33,7 @@ Based on `pdr.txt`. Unity 2022 LTS + URP, Meta Quest standalone.
 ### M5 — Weather & Progression
 - [x] `ThermalField` — column lift zones
 - [ ] Wind layers, turbulence noise
+- [x] Wind field sampling + drift
 - [ ] Modes: free flight, thermal hunt, cross-country, training
 
 ### M6 — Polish

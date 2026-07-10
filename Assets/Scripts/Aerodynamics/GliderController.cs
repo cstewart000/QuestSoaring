@@ -11,13 +11,24 @@ namespace QuestSoaring.Aerodynamics
         [SerializeField] float _airBrakes;
 
         Rigidbody _rb;
-        GliderAeroModel _model = GliderAeroModel.Beginner;
+        GliderProfile _profile = GliderProfile.Beginner;
 
         void Awake()
         {
             _rb = GetComponent<Rigidbody>();
-            _rb.mass = _model.Mass;
-            Debug.Log("[GliderController] Awake — beginner profile loaded");
+            ApplyProfileMass();
+        }
+
+        public void SetProfile(GliderProfile profile)
+        {
+            _profile = profile;
+            ApplyProfileMass();
+            Debug.Log($"[GliderController] Profile: {profile.Name}");
+        }
+
+        void ApplyProfileMass()
+        {
+            if (_rb != null) _rb.mass = _profile.Aero.Mass;
         }
 
         public void SetControlInputs(float pitch, float roll, float rudder, float airBrakes)
@@ -36,17 +47,18 @@ namespace QuestSoaring.Aerodynamics
 
         void ApplyControlSurfaces()
         {
-            var pitchTorque = _pitchInput * 8000f;
-            var rollTorque = _rollInput * 12000f;
+            var pitchTorque = _pitchInput * _profile.PitchAuthority;
+            var rollTorque = _rollInput * _profile.RollAuthority;
             var yawTorque = _rudderInput * 4000f;
             _rb.AddRelativeTorque(new Vector3(pitchTorque, yawTorque, -rollTorque));
         }
 
         void ApplyAerodynamics()
         {
+            var model = _profile.Aero;
             var vel = _rb.velocity;
-            var aoa = _model.AngleOfAttackDeg(vel, transform.forward, transform.up);
-            var forces = _model.Compute(vel, aoa, _airBrakes);
+            var aoa = model.AngleOfAttackDeg(vel, transform.forward, transform.up);
+            var forces = model.Compute(vel, aoa, _airBrakes);
             var liftDir = Vector3.Cross(_rb.velocity.normalized, transform.right).normalized;
             if (liftDir.sqrMagnitude < 0.01f) liftDir = transform.up;
             _rb.AddForce(liftDir * forces.Lift);

@@ -23,14 +23,18 @@ namespace QuestSoaring.SceneSetup
             rb.velocity = go.transform.forward * 28f;
 
             var controller = go.AddComponent<GliderController>();
+            controller.SetProfile(GliderProfile.Beginner);
             var hub = go.AddComponent<GliderInputHub>();
             hub.Bind(controller);
 
-            var lift = go.AddComponent<ThermalLiftApplier>();
-            lift.Init(thermals, rb);
+            var thermal = go.AddComponent<ThermalLiftApplier>();
+            thermal.Init(thermals, rb);
+            go.AddComponent<WindDriftApplier>().Init(rb);
+            go.AddComponent<RidgeLiftApplier>().Init(rb);
 
             GliderMeshBuilder.Build(go.transform);
             BuildCockpit(go.transform, hub, rb);
+            ControlHintsUI.Create(null);
             Debug.Log("[GliderFactory] Glider rig ready at 600m");
             return new GliderRig { Root = go.transform, Body = rb, Hub = hub };
         }

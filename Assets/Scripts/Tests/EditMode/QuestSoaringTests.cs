@@ -15,6 +15,12 @@ namespace QuestSoaring.Tests
         public void SetUp() => _model = GliderAeroModel.Beginner;
 
         [Test]
+        public void PerformanceProfile_HasHigherGlideRatio()
+        {
+            Assert.Greater(GliderProfile.Performance.Aero.BestGlideRatio,
+                GliderProfile.Beginner.Aero.BestGlideRatio);
+        }
+        [Test]
         public void LiftIncreasesWithPositiveAoA()
         {
             var low = _model.Compute(new Vector3(0, 0, 25f), 2f, 0f);
@@ -97,6 +103,36 @@ namespace QuestSoaring.Tests
         {
             var vario = FlightInstruments.CalcVarioMps(90f, 100f, 2f);
             Assert.AreEqual(-5f, vario, 0.01f);
+        }
+    }
+
+    public class RidgeLiftTests
+    {
+        [Test]
+        public void RidgeLift_ZeroWhenWindAwayFromSlope()
+        {
+            var wind = new Vector3(0f, 0f, 10f);
+            var normal = new Vector3(0f, 0.7f, 0.7f).normalized;
+            Assert.AreEqual(0f, RidgeLiftModel.CalcLiftMs(wind, normal));
+        }
+
+        [Test]
+        public void RidgeLift_PositiveWhenWindIntoSlope()
+        {
+            var wind = new Vector3(10f, 0f, 0f);
+            var normal = new Vector3(-0.5f, 0.5f, 0f).normalized;
+            Assert.Greater(RidgeLiftModel.CalcLiftMs(wind, normal), 0f);
+        }
+    }
+
+    public class WindFieldTests
+    {
+        [Test]
+        public void Wind_IncreasesWithAltitude()
+        {
+            var low = WindField.Sample(new Vector3(0f, 100f, 0f)).Velocity.magnitude;
+            var high = WindField.Sample(new Vector3(0f, 1500f, 0f)).Velocity.magnitude;
+            Assert.Greater(high, low);
         }
     }
 }
