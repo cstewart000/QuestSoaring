@@ -5,19 +5,19 @@
   <title>Quest Soaring — Terrain Preview</title>
   <style>
     * { margin: 0; box-sizing: border-box; }
-    body { overflow: hidden; background: #121418; font-family: system-ui, sans-serif; }
+    body { overflow: hidden; background: #0e1014; font-family: system-ui, sans-serif; }
     #hud {
-      position: fixed; left: 12px; top: 12px; color: #e6ebe0;
-      background: rgba(26,26,31,0.9); padding: 10px 14px; border-radius: 8px;
-      font-size: 13px; line-height: 1.6; z-index: 10; max-width: 360px;
+      position: fixed; left: 12px; top: 12px; color: #d8dcd6;
+      background: rgba(18,18,22,0.92); padding: 10px 14px; border-radius: 8px;
+      font-size: 13px; line-height: 1.6; z-index: 10; max-width: 380px;
     }
     #err { color: #f88; display: none; margin-top: 8px; }
-    kbd { background: #2a3540; padding: 1px 6px; border-radius: 3px; }
+    kbd { background: #2a2e34; padding: 1px 6px; border-radius: 3px; }
   </style>
 </head>
 <body>
   <div id="hud">
-    <strong>Terrain Preview</strong><br>
+    <strong>Terrain Preview</strong> · grayscale ridged<br>
     <kbd>Drag</kbd> orbit · <kbd>Scroll</kbd> zoom · <kbd>WASD</kbd> pan<br>
     <span id="stats">Loading…</span>
     <div id="err"></div>
@@ -27,100 +27,72 @@
    "three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
   </script>
   <script type="module">
+    import { buildChunkMesh, chunkCoords, CHUNK } from './chunk_mesh.js';
+
     const errEl = document.getElementById('err');
     const fail = msg => { errEl.style.display = 'block'; errEl.textContent = msg; console.error(msg); };
-
-    if (location.protocol === 'file:') {
-      fail('Open via server: python3 tools/terrain/serve.py');
-      throw new Error('file protocol');
-    }
-
-    const RES = 16, CHUNK = 256, SCALE = 800, OCTAVES = 4;
-    const perm = new Uint8Array(512);
-    for (let i = 0; i < 256; i++) perm[i] = perm[i + 256] = i;
-    for (let i = 255; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [perm[i], perm[j]] = [perm[j], perm[i]]; }
-    const fade = t => t * t * t * (t * (t * 6 - 15) + 10);
-    const lerp = (a, b, t) => a + t * (b - a);
-    const hash = (x, y) => perm[perm[x & 255] + (y & 255)] & 15;
-    const grad = (h, x, y) => ((h & 1) ? -x : x) + ((h & 2) ? -y : y);
-    function perlin(x, y) {
-      const xi = Math.floor(x) & 255, yi = Math.floor(y) & 255;
-      const xf = x - Math.floor(x), yf = y - Math.floor(y);
-      const u = fade(xf), v = fade(yf);
-      return lerp(lerp(grad(hash(xi,yi),xf,yf), grad(hash(xi+1,yi),xf-1,yf), u),
-        lerp(grad(hash(xi,yi+1),xf,yf-1), grad(hash(xi+1,yi+1),xf-1,yf-1), u), v) * 0.5 + 0.5;
-    }
-    function sampleHeight(x, z) {
-      let h = 0, amp = 1, freq = 1 / SCALE;
-      for (let i = 0; i < OCTAVES; i++) { h += perlin(x * freq, z * freq) * amp; amp *= 0.5; freq *= 2; }
-      return h * 400;
-    }
+    if (location.protocol === 'file:') { fail('Run: python3 tools/terrain/serve.py'); throw new Error('file'); }
 
     try {
       const THREE = await import('three');
       const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
 
+      const sky = 0xb8bcc4;
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x889098);
-      scene.fog = new THREE.Fog(0x889098, 800, 2800);
-      const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 1, 5000);
-      camera.position.set(400, 650, 400);
+      scene.background = new THREE.Color(sky);
+      scene.fog = new THREE.FogExp2(sky, 0.00055);
+
+      const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 1, 5000);
+      camera.position.set(380, 620, 420);
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       document.body.appendChild(renderer.domElement);
+
       const controls = new OrbitControls(camera, renderer.domElement);
-      controls.target.set(0, 500, 0);
+      controls.target.set(0, 420, 0);
       controls.enableDamping = true;
-      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-      const sun = new THREE.DirectionalLight(0xfff5e6, 1.1);
-      sun.position.set(200, 400, 100);
+      controls.maxPolarAngle = Math.PI * 0.48;
+
+      scene.add(new THREE.HemisphereLight(0xd8dce4, 0x3a4048, 0.65));
+      const sun = new THREE.DirectionalLight(0xffffff, 0.95);
+      sun.position.set(-120, 280, 180);
       scene.add(sun);
 
       const chunks = new Map(), root = new THREE.Group();
       scene.add(root);
+      const mat = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
 
-      function buildChunk(cx, cz) {
-        const ox = cx * CHUNK, oz = cz * CHUNK;
-        const verts = [], tris = [], colors = [];
-        for (let z = 0; z < RES; z++) for (let x = 0; x < RES; x++) {
-          const wx = ox + x * CHUNK / (RES - 1), wz = oz + z * CHUNK / (RES - 1);
-          const wy = sampleHeight(wx, wz);
-          verts.push(wx, wy, wz);
-          const g = 0.45 + (wy / 400) * 0.35;
-          colors.push(g, g, g + 0.02);
-        }
-        for (let z = 0; z < RES - 1; z++) for (let x = 0; x < RES - 1; x++) {
-          const i = z * RES + x;
-          tris.push(i, i + RES, i + 1, i + 1, i + RES, i + RES + 1);
-        }
+      function addChunk(cx, cz) {
+        const k = `${cx},${cz}`;
+        if (chunks.has(k)) return;
+        const d = buildChunkMesh(cx, cz);
         const geo = new THREE.BufferGeometry();
-        geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-        geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        geo.setIndex(tris);
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(d.verts, 3));
+        geo.setAttribute('color', new THREE.Float32BufferAttribute(d.colors, 3));
+        geo.setIndex(d.tris);
         geo.computeVertexNormals();
-        const mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }));
-        root.add(mesh);
-        chunks.set(`${cx},${cz}`, mesh);
+        root.add(new THREE.Mesh(geo, mat));
+        chunks.set(k, true);
       }
 
       function sync() {
         const t = controls.target;
-        const cx = Math.floor(t.x / CHUNK), cz = Math.floor(t.z / CHUNK);
-        const need = new Set();
-        for (let dz = -2; dz <= 2; dz++) for (let dx = -2; dx <= 2; dx++) {
-          const k = `${cx + dx},${cz + dz}`;
-          need.add(k);
-          if (!chunks.has(k)) buildChunk(cx + dx, cz + dz);
-        }
-        for (const [k, m] of chunks) if (!need.has(k)) { root.remove(m); m.geometry.dispose(); chunks.delete(k); }
-        document.getElementById('stats').textContent = `Chunks: ${chunks.size} · ${t.x.toFixed(0)}, ${t.z.toFixed(0)} m`;
+        const need = new Set(chunkCoords(t.x, t.z, 2).map(([x,z]) => `${x},${z}`));
+        need.forEach(k => { const [x,z] = k.split(',').map(Number); addChunk(x, z); });
+        document.getElementById('stats').textContent =
+          `Chunks: ${chunks.size} · ${t.x.toFixed(0)}, ${t.z.toFixed(0)} m · flat grayscale`;
       }
 
       sync();
       const keys = {};
       addEventListener('keydown', e => keys[e.code] = true);
       addEventListener('keyup', e => keys[e.code] = false);
-      addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+      addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
       let last = 0;
       (function loop() {
         requestAnimationFrame(loop);
@@ -132,10 +104,8 @@
         controls.update();
         renderer.render(scene, camera);
       })();
-      console.log('[TerrainPreview] Ready');
-    } catch (e) {
-      fail('Load failed: ' + e.message + ' — check network for Three.js CDN');
-    }
+      console.log('[TerrainPreview] Ridged grayscale — chunk', CHUNK);
+    } catch (e) { fail('Load failed: ' + e.message); }
   </script>
 </body>
 </html>

@@ -8,7 +8,12 @@ namespace QuestSoaring.SceneSetup
     {
         public static Material CreateTerrainMaterial()
         {
-            return RenderUtil.CreateLitMaterial(new Color(0.55f, 0.55f, 0.58f));
+            var shader = Shader.Find("QuestSoaring/TerrainVertexColor")
+                ?? Shader.Find("Universal Render Pipeline/Unlit");
+            var mat = new Material(shader);
+            if (mat.HasProperty("_Brightness")) mat.SetFloat("_Brightness", 1.05f);
+            Debug.Log("[WorldFactory] Grayscale vertex-color terrain material");
+            return mat;
         }
 
         public static ThermalField CreateThermals(Transform parent)
@@ -40,11 +45,11 @@ namespace QuestSoaring.SceneSetup
         {
             var go = new GameObject("Sun");
             go.transform.SetParent(parent);
-            go.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+            go.transform.rotation = Quaternion.Euler(38f, -35f, 0f);
             var light = go.AddComponent<Light>();
             light.type = LightType.Directional;
-            light.intensity = 1.1f;
-            light.color = new Color(1f, 0.96f, 0.9f);
+            light.intensity = 0.95f;
+            light.color = new Color(0.98f, 0.98f, 1f);
         }
     }
 }

@@ -76,16 +76,16 @@ namespace QuestSoaring.Tests
         [Test]
         public void HeightNoise_IsDeterministic()
         {
-            var a = HeightNoise.Sample(120f, 340f, 800f, 4);
-            var b = HeightNoise.Sample(120f, 340f, 800f, 4);
+            var a = HeightNoise.Sample(120f, 340f, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
+            var b = HeightNoise.Sample(120f, 340f, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
             Assert.AreEqual(a, b);
         }
 
         [Test]
         public void HeightNoise_InExpectedRange()
         {
-            var h = HeightNoise.Sample(0f, 0f, 800f, 4);
-            Assert.That(h, Is.InRange(0f, 400f));
+            var h = HeightNoise.Sample(0f, 0f, HeightNoise.DefaultScale, HeightNoise.DefaultOctaves);
+            Assert.That(h, Is.InRange(0f, HeightNoise.MaxHeight));
         }
     }
 

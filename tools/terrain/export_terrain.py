@@ -5,8 +5,8 @@ import struct
 import sys
 import zlib
 
-SCALE, OCTAVES, HEIGHT_MUL = 800.0, 4, 400.0
-RES, CHUNK = 64, 256  # higher RES for export quality
+SCALE, OCTAVES, MAX_H = 620.0, 5, 480.0
+RES, CHUNK = 64, 256
 
 
 def fade(t):
@@ -44,12 +44,16 @@ def perlin(x, y):
 
 
 def sample_height(x, z):
-    h, amp, freq = 0.0, 1.0, 1.0 / SCALE
+    h, amp, freq, amp_sum = 0.0, 1.0, 1.0 / SCALE, 0.0
     for _ in range(OCTAVES):
-        h += perlin(x * freq, z * freq) * amp
-        amp *= 0.5
-        freq *= 2.0
-    return h * HEIGHT_MUL
+        n = perlin(x * freq, z * freq)
+        n = 1 - abs(n * 2 - 1)
+        h += n * n * amp
+        amp_sum += amp
+        amp *= 0.52
+        freq *= 2.1
+    norm = max(0.0, min(1.0, h / amp_sum))
+    return (norm ** 1.28) * MAX_H
 
 
 def write_png(path, w, h, gray_bytes):
